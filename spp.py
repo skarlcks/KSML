@@ -11,7 +11,7 @@ st.title("📊 KSML 직업 분석 대시보드")
 @st.cache_data
 def load_data():
     # 실제 파일명을 확인하세요. (리포지토리에 올린 파일명과 똑같아야 합니다)
-    file_name = "KSML_fully_linked_experimental.xlsx"
+    file_name = "KSML_fully_linked_experimental.csv"
     
     # 여러 인코딩 방식을 순차적으로 시도 (한글 깨짐 방지)
     encodings = ['utf-8-sig', 'cp949', 'euc-kr', 'latin1']
