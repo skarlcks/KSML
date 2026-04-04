@@ -1,4 +1,6 @@
-
+import streamlit as st
+import pandas as pd
+import plotly.express as px
 @st.cache_data
 def load_data():
     file_path = "KSML_fully_linked_experimental.xlsx - ksco_495_final.csv" # 여기에 실제 파일명을 넣으세요
