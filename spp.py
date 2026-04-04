@@ -11,7 +11,7 @@ st.markdown("한국형 직업 지표(KSML)와 신체적 강도를 분석한 결�
 # 데이터 로드 (파일 경로를 실제 파일명으로 수정하세요)
 @st.cache_data
 def load_data():
-    df = pd.read_csv("KSML_fully_linked_experimental.xlsx")
+    df = pd.read_csv("KSML_fully_linked_experimental.xlsx",encoding="cp949"
     return df
 
 try:
