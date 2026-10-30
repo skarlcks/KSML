@@ -176,9 +176,9 @@ align-items:flex-start;justify-content:center;padding:20px;overflow:auto;
 .anote{font-size:11px;color:var(--tx2);line-height:1.7;margin-bottom:15px}
 .abox label{display:block;font-size:11px;color:var(--tx2);margin-bottom:10px}
 .abox label input{display:block;width:100%;margin-top:4px}
-#abtn,#alog{width:100%;padding:11px;border:0;border-radius:8px;background:var(--navy);color:#fff;
+#abtnV,#abtnA,#alog{width:100%;padding:11px;border:0;border-radius:8px;background:var(--navy);color:#fff;
 font:inherit;font-size:13px;font-weight:600;cursor:pointer;margin-top:4px}
-#abtn:disabled,#alog:disabled{background:#9fb0c4;cursor:default}
+#abtnV:disabled,#abtnA:disabled,#alog:disabled{background:#9fb0c4;cursor:default}
 .amsg{font-size:11px;margin-top:10px;line-height:1.6;color:var(--tx2);min-height:16px}
 .amsg.err{color:var(--red)}
 .amsg.ok{color:var(--navy)}
@@ -193,6 +193,14 @@ font:inherit;font-size:13px;font-weight:600;cursor:pointer;margin-top:4px}
 .abox .x{position:absolute;top:11px;right:11px;border:0;background:none;color:var(--tx3);
   font-size:14px;cursor:pointer;line-height:1;padding:3px 5px}
 .abox .x:hover{color:var(--navy)}
+.atabs{display:flex;gap:4px;background:#eef2f7;border-radius:9px;padding:3px;margin:12px 0 15px}
+.atab{flex:1;border:0;background:none;font:inherit;font-size:11.5px;font-weight:600;
+  color:var(--tx2);padding:8px 4px;border-radius:7px;cursor:pointer}
+.atab.on{background:#fff;color:var(--navy);box-shadow:0 1px 3px rgba(15,25,40,.10)}
+.apane{display:none}
+.apane.on{display:block}
+.afoot{font-size:10px;color:var(--tx3);line-height:1.6;margin-top:14px;
+  padding-top:11px;border-top:1px solid var(--brd2)}
 @media (max-width:420px){
   #adm{padding:10px}
   .abox{padding:18px 16px 16px}
@@ -359,27 +367,38 @@ input[type=range]::-moz-range-thumb{width:19px;height:19px}
 
     <div class="astage" id="apanel">
       <h2>관리</h2>
-      <p class="anote">바꿀 항목만 채우십시오. 적용된 <b>index.html</b> 파일을 내려받아
-        저장소의 <b>docs</b> 폴더에 올리면 그때부터 반영됩니다.</p>
-
-      <div class="asec">열람 비밀번호</div>
-      <label>현재 열람 비밀번호<input type="password" id="apw0" autocomplete="off"></label>
-      <div class="arow">
-        <label>새 비밀번호<input type="password" id="apw1" autocomplete="off" placeholder="4자 이상"></label>
-        <label>새 비밀번호 확인<input type="password" id="apw2" autocomplete="off"></label>
+      <div class="atabs">
+        <button type="button" class="atab on" data-t="v">열람 비밀번호</button>
+        <button type="button" class="atab" data-t="a">관리자 계정</button>
       </div>
-      <p class="ahint">바꾸지 않으려면 세 칸을 모두 비워 두십시오.</p>
 
-      <div class="asec sp">관리자 계정</div>
-      <label>아이디<input type="text" id="nid" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
-      <div class="arow">
-        <label>새 관리자 비밀번호<input type="password" id="nkw1" autocomplete="off" placeholder="4자 이상"></label>
-        <label>확인<input type="password" id="nkw2" autocomplete="off"></label>
+      <div class="apane on" id="pane_v">
+        <p class="anote">자료를 여는 비밀번호를 바꿉니다. 현재 비밀번호로 자료를 푼 뒤
+          새 비밀번호로 다시 잠근 <b>index.html</b>을 내려받습니다.</p>
+        <label>현재 열람 비밀번호<input type="password" id="apw0" autocomplete="off"></label>
+        <div class="arow">
+          <label>새 비밀번호<input type="password" id="apw1" autocomplete="off" placeholder="4자 이상"></label>
+          <label>확인<input type="password" id="apw2" autocomplete="off"></label>
+        </div>
+        <button id="abtnV">새 파일 만들기</button>
+        <div class="amsg" id="amsgV"></div>
       </div>
-      <p class="ahint">비밀번호 두 칸을 비워 두면 지금 관리자 비밀번호가 그대로 유지됩니다.</p>
 
-      <button id="abtn">새 파일 만들기</button>
-      <div class="amsg" id="amsg"></div>
+      <div class="apane" id="pane_a">
+        <p class="anote">관리 화면에 들어오는 아이디와 비밀번호를 바꿉니다.
+          열람 비밀번호와 자료는 그대로 둡니다.</p>
+        <label>아이디<input type="text" id="nid" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
+        <div class="arow">
+          <label>새 관리자 비밀번호<input type="password" id="nkw1" autocomplete="off" placeholder="4자 이상"></label>
+          <label>확인<input type="password" id="nkw2" autocomplete="off"></label>
+        </div>
+        <p class="ahint">아이디만 바꾸려면 비밀번호 두 칸을 비워 두십시오.</p>
+        <button id="abtnA">새 파일 만들기</button>
+        <div class="amsg" id="amsgA"></div>
+      </div>
+
+      <p class="afoot">내려받은 <b>index.html</b>을 저장소 <b>docs</b> 폴더의 같은 이름 파일과
+        바꿔 올리면 그때부터 반영됩니다.</p>
     </div>
   </div>
 </div>
@@ -471,9 +490,17 @@ $('gform').addEventListener('submit',async e=>{
 let AID=null, AKW=null;
 const show=s=>{$('alogin').classList.toggle('on',s==='login');
                $('apanel').classList.toggle('on',s==='panel');};
-function close(){ $('adm').classList.remove('on'); show('login');
+function tab(t){
+  document.querySelectorAll('.atab').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
+  $('pane_v').classList.toggle('on',t==='v');
+  $('pane_a').classList.toggle('on',t==='a');
+}
+document.querySelectorAll('.atab').forEach(b=>b.onclick=()=>tab(b.dataset.t));
+
+function close(){ $('adm').classList.remove('on'); show('login'); tab('v');
   ['aid','akw','apw0','apw1','apw2','nkw1','nkw2'].forEach(k=>$(k).value='');
-  $('lmsg').textContent=''; $('amsg').textContent=''; AID=AKW=null; }
+  ['lmsg','amsgV','amsgA'].forEach(k=>{$(k).textContent='';$(k).className='amsg';});
+  AID=AKW=null; }
 $('gadmin').onclick=()=>{ $('adm').classList.add('on'); setTimeout(()=>$('aid').focus(),60); };
 $('aclose').onclick=close;
 $('adm').addEventListener('click',e=>{ if(e.target.id==='adm') close(); });
@@ -487,68 +514,78 @@ $('aform').addEventListener('submit',async e=>{
   if(!ok){ m.className='amsg err'; m.textContent='아이디 또는 관리자 비밀번호가 맞지 않습니다.';
            $('akw').value=''; $('akw').focus(); return; }
   AID=id.trim().toLowerCase(); AKW=pw; m.textContent='';
-  $('nid').value=AID; show('panel');
+  $('nid').value=AID; show('panel'); tab('v');
   if(VPW) $('apw0').value=VPW;
   setTimeout(()=>$('apw1').focus(),60);
 });
 
-$('abtn').onclick=async()=>{
-  const m=$('amsg'),
-        p0=$('apw0').value, p1=$('apw1').value, p2=$('apw2').value,
-        ni=$('nid').value.trim().toLowerCase(), k1=$('nkw1').value, k2=$('nkw2').value;
-  const chV=!!(p1||p2), chA=!!(k1||k2||(ni&&ni!==AID));
-  m.className='amsg';
-  if(!chV&&!chA){ m.className='amsg err'; m.textContent='바꿀 항목을 입력하십시오.'; return; }
-  if(chV){
-    if(p1.length<4){ m.className='amsg err'; m.textContent='새 열람 비밀번호는 4자 이상이어야 합니다.'; return; }
-    if(p1!==p2){ m.className='amsg err'; m.textContent='새 열람 비밀번호가 서로 다릅니다.'; return; }
-    if(!p0){ m.className='amsg err'; m.textContent='현재 열람 비밀번호를 입력하십시오.'; return; }
+/* 현재 HTML을 받아 상수만 갈아끼운 파일을 내려받기 */
+async function rebuild(sets){
+  const res=await fetch(location.href,{cache:'no-store'});
+  if(!res.ok) throw new Error('tpl');
+  let html=await res.text();
+  for(const [name,val] of sets){
+    const tag='const '+name+'="', i=html.indexOf(tag);
+    if(i<0) throw new Error('tpl');
+    const j=html.indexOf('"',i+tag.length);
+    html=html.slice(0,i+tag.length)+val+html.slice(j);
   }
-  if(chA){
-    if(!ni){ m.className='amsg err'; m.textContent='관리자 아이디를 입력하십시오.'; return; }
-    if(k1||k2){
-      if(k1.length<4){ m.className='amsg err'; m.textContent='새 관리자 비밀번호는 4자 이상이어야 합니다.'; return; }
-      if(k1!==k2){ m.className='amsg err'; m.textContent='새 관리자 비밀번호가 서로 다릅니다.'; return; }
-    }
-  }
-  $('abtn').disabled=true; m.textContent='새 파일을 만드는 중…';
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([html],{type:'text/html'}));
+  a.download='index.html'; document.body.appendChild(a); a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},2000);
+}
+const tplMsg='이 화면에서는 파일을 만들 수 없습니다. 웹 주소(https://…)로 접속해 다시 시도하십시오.';
+
+/* ① 열람 비밀번호 */
+$('abtnV').onclick=async()=>{
+  const m=$('amsgV'), p0=$('apw0').value, p1=$('apw1').value, p2=$('apw2').value;
+  m.className='amsg err';
+  if(!p0){ m.textContent='현재 열람 비밀번호를 입력하십시오.'; return; }
+  if(p1.length<4){ m.textContent='새 비밀번호는 4자 이상이어야 합니다.'; return; }
+  if(p1!==p2){ m.textContent='새 비밀번호가 서로 다릅니다.'; return; }
+  if(p1===p0){ m.textContent='지금 비밀번호와 같습니다.'; return; }
+  $('abtnV').disabled=true; m.className='amsg'; m.textContent='자료를 다시 잠그는 중…';
   try{
-    let pay=PAYLOAD;
-    if(chV){
-      const data=(VPW&&VPW===p0&&PLAIN)?PLAIN:await unlock(p0,PAYLOAD);
-      pay=await lock(p1,data);
-    }
-    let adm=ADMIN;
-    if(chA) adm=await admBlob(ni, k1||AKW);
-
-    const res=await fetch(location.href,{cache:'no-store'});
-    if(!res.ok) throw new Error('tpl');
-    let html=await res.text();
-    const put=(h,name,val)=>{
-      const tag='const '+name+'="', i=h.indexOf(tag);
-      if(i<0) throw new Error('tpl');
-      const j=h.indexOf('"',i+tag.length);
-      return h.slice(0,i+tag.length)+val+h.slice(j);
-    };
-    if(chV) html=put(html,'PAYLOAD',pay);
-    if(chA) html=put(html,'ADMIN',adm);
-
-    const a=document.createElement('a');
-    a.href=URL.createObjectURL(new Blob([html],{type:'text/html'}));
-    a.download='index.html'; document.body.appendChild(a); a.click();
-    setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},2000);
+    const data=(VPW&&VPW===p0&&PLAIN)?PLAIN:await unlock(p0,PAYLOAD);
+    const pay=await lock(p1,data);
+    await rebuild([['PAYLOAD',pay]]);
     m.className='amsg ok';
-    const what = (chV&&chA)?'새 열람 비밀번호와 새 관리자 계정이' : chV?'새 열람 비밀번호가' : '새 관리자 계정이';
-    m.innerHTML='<b>index.html</b>을 내려받았습니다. 저장소 <b>docs</b> 폴더의 같은 이름 파일을 '
-      +'이 파일로 바꿔 올리면 '+what+' 적용됩니다.';
-    ['apw1','apw2','nkw1','nkw2'].forEach(k=>$(k).value='');
+    m.innerHTML='<b>index.html</b>을 내려받았습니다. 이 파일로 바꿔 올리면 새 열람 비밀번호가 적용됩니다.';
+    $('apw1').value=$('apw2').value='';
   }catch(err){
     m.className='amsg err';
-    m.textContent = (err&&err.message==='tpl')
-      ? '이 화면에서는 파일을 만들 수 없습니다. 웹 주소(https://…)로 접속해 다시 시도하십시오.'
-      : '현재 열람 비밀번호가 맞지 않습니다.';
+    m.textContent=(err&&err.message==='tpl')?tplMsg:'현재 열람 비밀번호가 맞지 않습니다.';
   }
-  $('abtn').disabled=false;
+  $('abtnV').disabled=false;
+};
+
+/* ② 관리자 계정 */
+$('abtnA').onclick=async()=>{
+  const m=$('amsgA'), ni=$('nid').value.trim().toLowerCase(),
+        k1=$('nkw1').value, k2=$('nkw2').value;
+  m.className='amsg err';
+  if(!ni){ m.textContent='아이디를 입력하십시오.'; return; }
+  if(/\s/.test(ni)){ m.textContent='아이디에 빈칸을 쓸 수 없습니다.'; return; }
+  if(k1||k2){
+    if(k1.length<4){ m.textContent='새 관리자 비밀번호는 4자 이상이어야 합니다.'; return; }
+    if(k1!==k2){ m.textContent='새 관리자 비밀번호가 서로 다릅니다.'; return; }
+  }else if(ni===AID){ m.textContent='바꿀 내용이 없습니다.'; return; }
+  $('abtnA').disabled=true; m.className='amsg'; m.textContent='새 파일을 만드는 중…';
+  try{
+    const adm=await admBlob(ni, k1||AKW);
+    await rebuild([['ADMIN',adm]]);
+    m.className='amsg ok';
+    m.innerHTML='<b>index.html</b>을 내려받았습니다. 이 파일로 바꿔 올리면 아이디 <b>'
+      +ni.replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</b>'
+      +(k1?'와 새 비밀번호':'')+'로 들어오게 됩니다.';
+    AID=ni; if(k1) AKW=k1;
+    $('nkw1').value=$('nkw2').value='';
+  }catch(err){
+    m.className='amsg err';
+    m.textContent=(err&&err.message==='tpl')?tplMsg:'파일을 만들지 못했습니다.';
+  }
+  $('abtnA').disabled=false;
 };
 addEventListener('keydown',e=>{ if(e.key==='Escape'&&$('adm').classList.contains('on')) close(); });
 setTimeout(()=>$('gpw').focus(),120);
