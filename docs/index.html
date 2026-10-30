@@ -47,7 +47,7 @@ main{padding:16px 18px 30px;overflow-x:hidden}
 .kpi .k{font-size:10px;color:var(--tx2);margin-bottom:4px}
 .kpi .v{font-size:19px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.4px;color:var(--navy)}
 .kpi .d{font-size:10px;color:var(--tx3);margin-top:2px}
-.grid{display:grid;grid-template-columns:minmax(360px,1fr) minmax(360px,496px);gap:13px}
+.grid{display:grid;grid-template-columns:minmax(360px,1fr) minmax(360px,496px);gap:13px;min-width:0}
 .card{background:#fff;border:1px solid var(--brd);border-radius:10px;padding:13px}
 .ch{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px}
 .ch h2{font-size:12.5px;font-weight:700}
@@ -57,8 +57,8 @@ main{padding:16px 18px 30px;overflow-x:hidden}
 #map path:hover{stroke:#111;stroke-width:1.4}
 #map path.sido{stroke:#0d1623;stroke-width:2.1}
 .lgwrap{display:flex;align-items:flex-end;gap:10px;margin-top:10px}
-.lg{display:flex;align-items:center;gap:3px;font-size:9.5px;color:var(--tx2);flex:1}
-.lg .sw{flex:1;text-align:center}
+.lg{display:flex;align-items:center;gap:3px;font-size:9.5px;color:var(--tx2);flex:1;min-width:0}
+.lg .sw{flex:1;text-align:center;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .lg .sw i{display:block;height:9px;border-radius:2px;margin-bottom:3px}
 .cls{display:flex;border:1px solid var(--brd);border-radius:5px;overflow:hidden;flex:none}
 .cls div{padding:3px 7px;font-size:9.5px;color:var(--tx2);cursor:pointer;background:#fff}
@@ -94,11 +94,11 @@ border:1px solid var(--brd)}
 padding:7px 10px;font-size:11px;opacity:0;transition:opacity .1s;z-index:60;box-shadow:0 6px 18px rgba(0,0,0,.25)}
 #tip b{font-size:12px}
 #tip div{color:#b9c6d8;margin-top:3px;font-variant-numeric:tabular-nums}
-.scroll{max-height:620px;overflow-y:auto}
+.scroll{max-height:620px;overflow-y:auto;min-width:0}
 .foot{font-size:10px;color:var(--tx3);margin-top:12px;line-height:1.65}
 #mask{position:fixed;inset:0;background:rgba(15,25,40,.45);display:none;z-index:70}
 #mask.on{display:block}
-#modal{position:fixed;inset:5vh 50% auto auto;transform:translateX(50%);width:min(960px,94vw);
+#modal{position:fixed;inset:5vh 50% auto auto;transform:translateX(50%);width:min(980px,94vw);
 max-height:90vh;overflow-y:auto;background:#fff;border-radius:12px;padding:18px 20px;z-index:80;
 display:none;box-shadow:0 20px 60px rgba(0,0,0,.3)}
 #modal.on{display:block}
@@ -133,8 +133,44 @@ background:#fff;cursor:pointer;font-size:15px;color:var(--tx2);line-height:1}
 .mk .v{font-size:16px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--navy);margin-top:2px}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:15px}
 .two h4{font-size:11.5px;margin-bottom:7px;color:var(--tx)}
-@media(max-width:1100px){.wrap{grid-template-columns:1fr}aside{position:static;max-height:none}
-.grid{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}.two{grid-template-columns:1fr}}
+@media(max-width:1100px){
+.wrap{display:flex;flex-direction:column;min-width:0}
+main{min-width:0;order:1;padding-block:12px 24px}
+aside{order:2}
+#topslot .sec{border-top:0;margin-top:0;padding-top:0;margin-bottom:12px}
+#topslot .preset{grid-template-columns:repeat(4,1fr)}
+#topslot h3{margin-bottom:7px}
+aside{position:static;max-height:none;border-right:0;border-top:1px solid var(--brd)}
+.grid{grid-template-columns:1fr}
+.card{min-width:0}
+.kpis{grid-template-columns:repeat(3,1fr)}
+.two{grid-template-columns:1fr}
+.scroll{overflow-x:auto;max-height:460px;min-width:0}
+.card>.scroll{width:100%}
+.mscroll{max-height:40vh}
+.lgwrap{flex-wrap:wrap}
+.lg{min-width:100%;font-size:8.5px}
+#map{max-height:58vh!important}
+.ch{flex-wrap:wrap;gap:8px}
+.ch .seg{width:100%!important}
+}
+@media(max-width:600px){
+.kpis{grid-template-columns:repeat(2,1fr);gap:7px}
+.kpi{padding:9px 10px}.kpi .v{font-size:17px}
+.seg div{padding:9px 3px}
+.stp{width:32px;height:32px;line-height:30px;font-size:13px}
+.pbtn{padding:10px 4px}
+input[type=range]{height:5px}
+input[type=range]::-webkit-slider-thumb{width:19px;height:19px}
+input[type=range]::-moz-range-thumb{width:19px;height:19px}
+.tab{padding:8px 13px}
+#mini{min-width:0;width:min(290px,calc(100vw - 24px))}
+#modal{inset:3vh 8px auto 8px;left:8px;right:8px;transform:none;width:auto;padding:14px 13px;max-height:94vh}
+.mk{grid-template-columns:repeat(2,1fr)!important;gap:6px}
+.mk .v{font-size:14px}
+#map{max-height:52vh!important}
+.foot{font-size:9.5px}
+}
 </style>
 </head>
 <body>
@@ -142,7 +178,8 @@ background:#fff;cursor:pointer;font-size:15px;color:var(--tx2);line-height:1}
 <aside>
   <h1>AX 지역영향 시나리오판</h1>
   <div class="sub">제4장 노동시장 · 제5장 경제성장</div>
-  <div class="sec" style="border-top:0">
+  <div id="asideTop"></div>
+  <div class="sec" id="scenSec" style="border-top:0">
     <h3>시나리오</h3>
     <div class="preset" id="preset"></div>
   </div>
@@ -177,6 +214,7 @@ background:#fff;cursor:pointer;font-size:15px;color:var(--tx2);line-height:1}
   </div>
 </aside>
 <main>
+  <div id="topslot"></div>
   <div class="kpis" id="kpis"></div>
   <div class="grid">
     <div class="card">
@@ -620,6 +658,15 @@ function render(){
    `k=${ST.k.toFixed(4)}를 곱한 값이며, 지역·업종 결과는 해당 직종율을 취업자 구성에 적용한 집계. `+
    `TFP 성장률은 감소 인건비에 절감 실현율 g를 곱한 금액을 부가가치로 나눈 값. `+
    `지도의 색 구분은 ${CLS==='q'?'5분위(각 구간 지역 수 동일)':'등간격(각 구간 값 범위 동일)'}. 자료: 경제총조사(2020), 지역별고용조사, KNOW 기반 K-AXI.`;}
+function layout(){
+  const mob=innerWidth<=1100;
+  const sec=document.getElementById('scenSec');
+  const host=document.getElementById(mob?'topslot':'asideTop');
+  if(sec&&host&&sec.parentElement!==host){
+    mob?host.appendChild(sec):host.after(sec);
+  }
+}
+addEventListener('resize',layout);
 function sync(){['rs','rc','ws','wc','g'].forEach(k=>document.getElementById('s_'+k).value=P[k]);}
 function bind(){
   document.getElementById('preset').innerHTML=Object.keys(PRESET)
@@ -647,7 +694,7 @@ function bind(){
   addEventListener('click',e=>{
     if(!e.target.closest('#map')&&!e.target.closest('#mini')) hideMini();});
   sync();}
-bind();render();
+bind();layout();render();
 </script>
 </body>
 </html>
