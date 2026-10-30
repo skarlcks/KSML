@@ -155,8 +155,10 @@ aside{position:static;max-height:none;border-right:0;border-top:1px solid var(--
 .two{grid-template-columns:1fr}
 .scroll{overflow-x:auto;max-height:460px;min-width:0}
 .card>.scroll{width:100%}
-/* 휴대폰: 중첩 세로 스크롤 제거 — 팝업 하나만 위아래로 움직임 */
-.mscroll{max-height:none;overflow-y:visible;overflow-x:auto}
+/* 휴대폰: 팝업 하나만 위아래로 움직이고, 표 위에서는 가로 손짓만 표가 받음 */
+.mscroll{max-height:none;overflow-x:auto;overflow-y:hidden;
+touch-action:pan-x;overscroll-behavior-x:contain}
+.scroll{touch-action:pan-x pan-y}
 .mscroll table th{position:static}
 .mhead{position:static}
 body.lock{overflow:hidden;position:fixed;width:100%}
