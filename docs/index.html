@@ -681,19 +681,19 @@ function regSummary(d, ind, occ, memberIdx){
     pool=ST.sido.map(sd=>{const ms=ST.reg.filter(x=>x.sido===sd.name);
       let p2=0,y2=0; ms.forEach(r=>{const cs=CELLS[r.i]||{},cf=CELLF[r.i]||{};
         for(const b in cs){const f=cf[b];if(!f)continue;let e=0;for(const[j,x]of cs[b])e+=x;p2+=e*f[0];y2+=f[1];}});
-      return {nm:sd.name, rate:sd.rate, pby:y2>0?p2/y2:0};});
+      return {nm:sd.name, rate:sd.rate, pby:y2>0?p2/y2:0, tfp:sd.tfp};});
   }else{
-    pool=ST.reg.map(r=>({nm:r.sname||r.name, rate:r.rate, pby:pby0[r.i], i:r.i}));
+    pool=ST.reg.map(r=>({nm:r.sname||r.name, rate:r.rate, pby:pby0[r.i], tfp:r.tfp, i:r.i}));
   }
-  const mRate=MED(pool.map(x=>x.rate)), mPby=MED(pool.map(x=>x.pby));
-  const rr=mRate?d.rate/mRate:1, pr=mPby?pby/mPby:1;
-  const TY = rr>=1 ? (pr>=1?['고충격·고전환형','노동 충격이 크고 그 충격이 성장으로 전환되는 정도도 높은 유형']
-                           :['고충격·저전환형','노동 충격은 크나 부가가치 대비 인건비 비중이 낮아 성장 전환이 덜한 유형'])
-                   : (pr>=1?['저충격·고전환형','노동 충격은 작으나 인건비 비중이 높아 전환 효율이 좋은 유형']
-                           :['저충격·저전환형','노동 충격과 성장 전환이 모두 중위를 밑도는 유형']);
+  const mRate=MED(pool.map(x=>x.rate)), mPby=MED(pool.map(x=>x.pby)), mTfp=MED(pool.map(x=>x.tfp));
+  const rr=mRate?d.rate/mRate:1, pr=mPby?pby/mPby:1, tr=mTfp?d.tfp/mTfp:1;
+  const TY = rr>=1 ? (tr>=1?['고충격·고성장형','노동 충격이 크고 성장 전환도 함께 큰 유형']
+                           :['고충격·저성장형','노동 충격은 큰데 성장 전환이 따라오지 못하는 유형'])
+                   : (tr>=1?['저충격·고성장형','노동 충격은 작으나 성장 전환은 중위를 웃도는 유형']
+                           :['저충격·저성장형','노동 충격과 성장 전환이 모두 중위를 밑도는 유형']);
   let same=0, ex=[];
-  pool.forEach(r=>{const r2=mRate?r.rate/mRate:1, p2=mPby?r.pby/mPby:1;
-    if((r2>=1)===(rr>=1) && (p2>=1)===(pr>=1)){same++;
+  pool.forEach(r=>{const r2=mRate?r.rate/mRate:1, t2=mTfp?r.tfp/mTfp:1;
+    if((r2>=1)===(rr>=1) && (t2>=1)===(tr>=1)){same++;
       if(ex.length<3 && r.nm!==(d.sname||d.name)) ex.push(r.nm);}});
   const poolN=isS?'17개 시도':'229개 시군구';
   // 시나리오 민감도
@@ -719,8 +719,11 @@ function regSummary(d, ind, occ, memberIdx){
   const spread=mine.map(x=>x.rate);
   const worst=mine[spread.indexOf(Math.min(...spread))];
   const L=[];
+  const gap = tr>=rr
+    ? `부가가치 대비 인건비 비중이 ${f2(pby)}로 중위(${f2(mPby)})보다 높아 충격보다 성장이 더 크게 나타남`
+    : `부가가치 대비 인건비 비중이 ${f2(pby)}로 중위(${f2(mPby)})보다 낮아 성장이 충격만큼 따라오지 못함`;
   L.push(`<b>${TY[0]}</b> ${TY[1]}. 순변화율 ${f2(d.rate)}%로 ${poolN} 중위(${f2(mRate)}%)의 ${f2(rr)}배, `
-    +`부가가치 대비 인건비 비중 ${f2(pby)}로 중위(${f2(mPby)})의 ${f2(pr)}배. 같은 유형이 ${same}곳`
+    +`TFP 성장률 ${f3(d.tfp)}%로 중위(${f3(mTfp)}%)의 ${f2(tr)}배. ${gap}. 같은 유형이 ${same}곳`
     +(ex.length?` (${ex.join(', ')} 등)`:'')+`.`);
   L.push(`<b>시나리오 민감도</b> 순감소가 기본 ${n(base.dL)}명에서 복합 ${n(comp.dL)}명으로 ${f1(mult)}배. `
     +`순변화율은 `+mine.map(x=>`${x.nm} ${f2(x.rate)}%`).join(' · ')
