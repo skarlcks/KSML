@@ -133,6 +133,13 @@ background:#fff;cursor:pointer;font-size:15px;color:var(--tx2);line-height:1}
 .mk .v{font-size:16px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--navy);margin-top:2px}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:15px}
 .two h4{font-size:11.5px;margin-bottom:7px;color:var(--tx)}
+#expired{position:fixed;inset:0;background:#fff;z-index:200;display:none;
+align-items:center;justify-content:center;padding:24px}
+#expired.on{display:flex}
+#expired .ebox{text-align:center;max-width:380px}
+#expired .eicon{font-size:34px;margin-bottom:14px}
+#expired h2{font-size:17px;color:var(--navy);margin-bottom:10px}
+#expired p{font-size:12.5px;color:var(--tx2);line-height:1.8}
 @media(max-width:1100px){
 .wrap{display:flex;flex-direction:column;min-width:0}
 main{min-width:0;order:1;padding-block:12px 24px}
@@ -244,6 +251,14 @@ input[type=range]::-moz-range-thumb{width:19px;height:19px}
 </main>
 </div>
 <div id="tip"></div>
+<div id="expired">
+  <div class="ebox">
+    <div class="eicon">🔒</div>
+    <h2>열람 기간이 종료되었습니다</h2>
+    <p>이 자료는 2026년 11월 3일까지 공개되었습니다.<br>
+       문의: 국토연구원 국토·지역정책연구센터</p>
+  </div>
+</div>
 <div id="mask"></div>
 <div id="mini"></div>
 <div id="modal"><button class="x" id="xbtn">✕</button><div id="mbody"></div></div>
@@ -694,7 +709,25 @@ function bind(){
   addEventListener('click',e=>{
     if(!e.target.closest('#map')&&!e.target.closest('#mini')) hideMini();});
   sync();}
-bind();layout();render();
+// 열람 기간: 2026-11-03 24:00 KST 까지
+const DEADLINE=Date.UTC(2026,10,3,15,0,0);   // KST 2026-11-04 00:00
+function gate(){
+  if(Date.now()>DEADLINE){
+    document.getElementById('expired').classList.add('on');
+    document.querySelector('.wrap').style.display='none';
+    return false;
+  }
+  return true;
+}
+// 저장·복사 억제(완전 차단은 불가)
+addEventListener('contextmenu',e=>e.preventDefault());
+addEventListener('keydown',e=>{
+  const k=e.key.toLowerCase();
+  if((e.ctrlKey||e.metaKey)&&['s','u','p'].includes(k)) e.preventDefault();
+  if(k==='f12') e.preventDefault();
+  if((e.ctrlKey||e.metaKey)&&e.shiftKey&&['i','j','c'].includes(k)) e.preventDefault();
+});
+if(gate()){ bind();layout();render(); setInterval(gate,60000); }
 </script>
 </body>
 </html>
