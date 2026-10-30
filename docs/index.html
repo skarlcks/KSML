@@ -52,6 +52,20 @@ main{padding:16px 18px 30px;overflow-x:hidden}
   font-variant-numeric:tabular-nums;letter-spacing:-.4px;color:var(--navy)}
 .kpi.lab .v{color:var(--red)}
 .kpi .d{position:relative;z-index:2;font-size:9.5px;color:var(--tx3);margin-top:1px;line-height:1.3}
+.sum{background:#f6f9fc;border:1px solid var(--brd2);border-left:3px solid var(--navy);
+  border-radius:8px;padding:11px 13px;margin:0 0 12px}
+.sum p{font-size:11.5px;line-height:1.8;color:var(--tx);margin:0 0 5px}
+.sum p:last-child{margin-bottom:0}
+.sum b{color:var(--navy);font-weight:700;margin-right:5px;font-size:11px}
+.sec2{border:1px solid var(--brd);border-radius:8px;margin-bottom:10px;overflow:hidden}
+.sec2h{display:flex;align-items:center;gap:6px;padding:9px 12px;background:#f7f9fc;
+  font-size:11.5px;font-weight:700;color:var(--navy);cursor:pointer;user-select:none}
+.sec2h:hover{background:#eef3f9}
+.sec2h .ar{font-size:10px;transition:transform .15s;display:inline-block}
+.sec2.off .ar{transform:rotate(-90deg)}
+.sec2.off .sec2b{display:none}
+.sec2b{padding:0}
+.sec2b .mscroll,.sec2b .scroll{max-height:380px}
 .kpi.ring{display:flex;align-items:center;gap:10px}
 .kpi.ring .tx{flex:1;min-width:0}
 .kpi.ring .tx .k{margin-bottom:3px}
@@ -212,6 +226,11 @@ font:inherit;font-size:13px;font-weight:600;cursor:pointer;margin-top:4px}
 .apane.on{display:block}
 .afoot{font-size:10px;color:var(--tx3);line-height:1.6;margin-top:14px;
   padding-top:11px;border-top:1px solid var(--brd2)}
+@media (max-width:600px){
+  .sum{padding:9px 10px;margin-bottom:10px}
+  .sum p{font-size:11px;line-height:1.75}
+  .sec2h{padding:8px 10px;font-size:11px}
+}
 @media (max-width:420px){
   #adm{padding:10px}
   .abox{padding:18px 16px 16px}
@@ -385,8 +404,9 @@ const fmtN=(v,d=0)=>v.toLocaleString('ko-KR',{minimumFractionDigits:d,maximumFra
 const fmtMan=v=>fmtN(v/10000,1)+'만';
 const fmtJo=v=>fmtN(v/1000,2)+'조';
 
-function rates(){
-  const Rs=P.rs/100,Rc=P.rc/100,Ws=P.ws,Wc=P.wc;
+function rates(_rs,_rc,_ws,_wc){
+  const Rs=(_rs===undefined?P.rs:_rs)/100,Rc=(_rc===undefined?P.rc:_rc)/100,
+        Ws=(_ws===undefined?P.ws:_ws),Wc=(_wc===undefined?P.wc:_wc);
   const S=new Float64Array(NO),C=new Float64Array(NO);let sS=0,sC=0;
   for(let j=0;j<NO;j++){S[j]=Ws*O.se[j]+(1-Ws)*O.pe[j];C[j]=(1-Wc)*O.sb[j]+Wc*O.pb[j];
     sS+=S[j]*O.E[j];sC+=C[j]*O.E[j];}
@@ -625,13 +645,116 @@ function mtable(slot,cols,rows,defKey){
   draw();
 }
 const F={n:v=>fmtN(v),n1:v=>fmtN(v,1),n1:v=>fmtN(v,1),p2:v=>v.toFixed(2)+'%',p3:v=>v.toFixed(3)+'%',t:v=>v};
+
+/* 지역 특성 요약 ---------------------------------------------- */
+const SCEN4=[['기본',12,10,.7,.7],['보완감소',12,0,.7,.7],['물리확산',12,10,.5,.5],['복합',12,0,.5,.5]];
+let PBY=null, NETS=null;
+function regPBY(){                       // 지역별 인건비/부가가치 (시나리오 무관, 1회 계산)
+  if(PBY) return PBY;
+  PBY=new Float64Array(NR);
+  for(let a=0;a<NR;a++){const cs=CELLS[a]||{}, cf=CELLF[a]||{};let pb=0,yy=0;
+    for(const b in cs){const f=cf[b]; if(!f)continue;
+      let e=0; for(const [j,x] of cs[b]) e+=x;
+      pb+=e*f[0]; yy+=f[1];}
+    PBY[a]=yy>0?pb/yy:0;}
+  return PBY;
+}
+function scenNets(){ if(!NETS) NETS=SCEN4.map(x=>rates(x[1],x[2],x[3],x[4]).net); return NETS; }
+function natPBY(){ const p=regPBY();let pb=0,yy=0;
+  for(let a=0;a<NR;a++){const cs=CELLS[a]||{},cf=CELLF[a]||{};
+    for(const b in cs){const f=cf[b];if(!f)continue;let e=0;for(const[j,x]of cs[b])e+=x;pb+=e*f[0];yy+=f[1];}}
+  return yy>0?pb/yy:0.539; }
+let NPBY=null;
+/* 지역(또는 시도) 집합에 대한 요약 */
+function regSummary(d, ind, occ, memberIdx){
+  const nat=ST.nat, NI_=ST.ind, nE=nat.emp;
+  const f1=v=>v.toFixed(1), f2=v=>v.toFixed(2), f3=v=>v.toFixed(3), n=v=>fmtN(v);
+  const pby0=regPBY(); if(NPBY===null) NPBY=natPBY();
+  const mem = memberIdx || [d.i];
+  let pb=0,yy=0; ind.forEach(x=>{pb+=x.pb; yy+=x.Y;});
+  const pby=yy>0?pb/yy:0;
+  const MED=a=>{const b=[...a].sort((x,y)=>x-y);const h=b.length>>1;
+    return b.length%2?b[h]:(b[h-1]+b[h])/2;};
+  const isS=!!memberIdx;
+  let pool;
+  if(isS){
+    pool=ST.sido.map(sd=>{const ms=ST.reg.filter(x=>x.sido===sd.name);
+      let p2=0,y2=0; ms.forEach(r=>{const cs=CELLS[r.i]||{},cf=CELLF[r.i]||{};
+        for(const b in cs){const f=cf[b];if(!f)continue;let e=0;for(const[j,x]of cs[b])e+=x;p2+=e*f[0];y2+=f[1];}});
+      return {nm:sd.name, rate:sd.rate, pby:y2>0?p2/y2:0};});
+  }else{
+    pool=ST.reg.map(r=>({nm:r.sname||r.name, rate:r.rate, pby:pby0[r.i], i:r.i}));
+  }
+  const mRate=MED(pool.map(x=>x.rate)), mPby=MED(pool.map(x=>x.pby));
+  const rr=mRate?d.rate/mRate:1, pr=mPby?pby/mPby:1;
+  const TY = rr>=1 ? (pr>=1?['고충격·고전환형','노동 충격이 크고 그 충격이 성장으로 전환되는 정도도 높은 유형']
+                           :['고충격·저전환형','노동 충격은 크나 부가가치 대비 인건비 비중이 낮아 성장 전환이 덜한 유형'])
+                   : (pr>=1?['저충격·고전환형','노동 충격은 작으나 인건비 비중이 높아 전환 효율이 좋은 유형']
+                           :['저충격·저전환형','노동 충격과 성장 전환이 모두 중위를 밑도는 유형']);
+  let same=0, ex=[];
+  pool.forEach(r=>{const r2=mRate?r.rate/mRate:1, p2=mPby?r.pby/mPby:1;
+    if((r2>=1)===(rr>=1) && (p2>=1)===(pr>=1)){same++;
+      if(ex.length<3 && r.nm!==(d.sname||d.name)) ex.push(r.nm);}});
+  const poolN=isS?'17개 시도':'229개 시군구';
+  // 시나리오 민감도
+  const nets=scenNets();
+  const mine=SCEN4.map((sc,k)=>{let dL=0,emp=0;
+    mem.forEach(a=>{const er=R.E[a];for(let j=0;j<NO;j++){dL+=er[j]*nets[k][j];emp+=er[j];}});
+    return {nm:sc[0], dL, rate:emp?dL/emp*100:0};});
+  const ranks=SCEN4.map((sc,k)=>{
+    let arr;
+    if(isS){
+      arr=ST.sido.map(sd=>{const ms=ST.reg.filter(x=>x.sido===sd.name);
+        let dL=0,emp=0; ms.forEach(r=>{const er=R.E[r.i];
+          for(let j=0;j<NO;j++){dL+=er[j]*nets[k][j];emp+=er[j];}});
+        return {key:sd.name, rate:emp?dL/emp*100:0};}).sort((a,b)=>a.rate-b.rate);
+      return arr.findIndex(x=>x.key===d.name)+1;
+    }
+    arr=ST.reg.map(r=>{const er=R.E[r.i];let dL=0,emp=0;
+      for(let j=0;j<NO;j++){dL+=er[j]*nets[k][j];emp+=er[j];}
+      return {key:r.i, rate:emp?dL/emp*100:0};}).sort((a,b)=>a.rate-b.rate);
+    return arr.findIndex(x=>x.key===d.i)+1;});
+  const base=mine[0], comp=mine[3];
+  const mult=base.dL!==0?comp.dL/base.dL:0;
+  const spread=mine.map(x=>x.rate);
+  const worst=mine[spread.indexOf(Math.min(...spread))];
+  const L=[];
+  L.push(`<b>${TY[0]}</b> ${TY[1]}. 순변화율 ${f2(d.rate)}%로 ${poolN} 중위(${f2(mRate)}%)의 ${f2(rr)}배, `
+    +`부가가치 대비 인건비 비중 ${f2(pby)}로 중위(${f2(mPby)})의 ${f2(pr)}배. 같은 유형이 ${same}곳`
+    +(ex.length?` (${ex.join(', ')} 등)`:'')+`.`);
+  L.push(`<b>시나리오 민감도</b> 순감소가 기본 ${n(base.dL)}명에서 복합 ${n(comp.dL)}명으로 ${f1(mult)}배. `
+    +`순변화율은 `+mine.map(x=>`${x.nm} ${f2(x.rate)}%`).join(' · ')
+    +`로, ${worst.nm} 시나리오에서 충격이 가장 큼.`
+    +(ranks[0]&&ranks[3]?` 충격 순위는 ${poolN} 중 ${ranks[0]}위 → ${ranks[3]}위.`:''));
+  const lossI=[...ind].sort((a,b)=>a.dL-b.dL)[0];
+  const gainI=[...ind].sort((a,b)=>b.sav-a.sav)[0];
+  const lossO=occ&&occ.length?[...occ].sort((a,b)=>a.dL-b.dL)[0]:null;
+  L.push(`<b>집중 부문</b> 감소는 ${lossI.name}(${n(lossI.dL)}명, 전체의 ${f1(d.dL?lossI.dL/d.dL*100:0)}%)`
+    +(lossO?`과 ${lossO.name}(${n(lossO.dL)}명)`:'')+`에 집중. `
+    +(gainI.name!==lossI.name
+      ? `반면 성장액은 ${gainI.name}(${fmtN(gainI.sav,1)}십억)이 최대로, 감소 인원과 성장 기여가 어긋남.`
+      : `성장액도 같은 업종(${fmtN(gainI.sav,1)}십억)에서 최대.`));
+  return `<div class="sum">`+L.map(x=>`<p>${x}</p>`).join('')+`</div>`;
+}
+/* 접기·펴기 ---------------------------------------------------- */
+function secHTML(id,title,body,open){
+  return `<div class="sec2 ${open?'':'off'}" id="${id}">`
+    +`<div class="sec2h" data-s="${id}"><span class="ar">▾</span>${title}</div>`
+    +`<div class="sec2b">${body}</div></div>`;
+}
+function bindSec(){
+  document.querySelectorAll('.sec2h').forEach(h=>h.onclick=()=>{
+    document.getElementById(h.dataset.s).classList.toggle('off');});
+}
 function openRegion(d){
+  const OPEN0=innerWidth>700;
   const g=P.g/100, ri=d.i, cs=CELLS[ri]||{}, cf=CELLF[ri]||{};
   const ind=[];
   for(const b in cs){let dL=0,emp=0;
     for(const [j,e] of cs[b]){dL+=e*NET[j];emp+=e;}
     const f=cf[b], sav=f?-dL*f[0]*g:0, Y=f?f[1]:0;
-    ind.push({name:I.name[b],emp,dL,rate:emp?dL/emp*100:0,sav,tfp:Y>0?sav/Y*100:0});}
+    ind.push({b:+b,name:I.name[b],emp,dL,rate:emp?dL/emp*100:0,sav,tfp:Y>0?sav/Y*100:0,
+      Y,pb:f?emp*f[0]:0});}
   ind.sort((a,b)=>a.dL-b.dL);
   const er=R.E[ri],wr=R.W[ri],occ=[];
   for(let j=0;j<NO;j++) if(er[j]>0) occ.push({name:O.name[j],emp:er[j],dL:er[j]*NET[j],
@@ -649,9 +772,9 @@ function openRegion(d){
      <div class="eco"><div class="k">부가가치</div><div class="v">${fmtN(d.Y/1000,1)}<span> 조원</span></div></div>
      <div class="eco"><div class="k">TFP 성장률</div><div class="v">${d.tfp.toFixed(3)}<span>%</span></div></div>
      <div class="eco"><div class="k">TFP 증가액</div><div class="v">${fmtN(d.sav,0)}<span> 십억</span></div></div></div></div>
-    <div class="two">
-     <div><h4>업종별 기여 · ${ind.length}개</h4><div class="mscroll"><table id="t_a"></table></div></div>
-     <div><h4>직종별 기여 · ${occ.length}개</h4><div class="mscroll"><table id="t_b"></table></div></div></div>
+    ${regSummary(d,ind,occ)}
+    ${secHTML('s_a','업종별 기여 · '+ind.length+'개','<div class="mscroll"><table id="t_a"></table></div>',OPEN0)}
+    ${secHTML('s_b','직종별 기여 · '+occ.length+'개','<div class="mscroll"><table id="t_b"></table></div>',OPEN0)}
     <div class="mnote">업종별 기여는 이 지역 각 업종 사업체의 직종 구성에 직종별 순변화율을 적용해 합산한 값.
      직종별 기여는 이 지역 전체 취업자의 직종 구성에 적용한 값이며, 순변화율은 전국 공통.
      두 분해의 합계는 ${fmtN(sum)}명으로 동일. TFP 증가액 단위는 십억원이며 두 표의 합은
@@ -663,6 +786,7 @@ function openRegion(d){
   mtable('t_b',[{h:'직종',k:'name',f:F.t,s:1,l:1},{h:'취업자',u:'명',k:'emp',f:F.n,c:'#8aa0b8'},
     {h:'순변화율',u:'%',k:'rate',f:F.p2,c:'#E4032E'},{h:'순감소',u:'명',k:'dL',f:F.n,c:'#E4032E'},
     {h:'증가액',u:'십억',k:'sav',f:F.n1,c:'#003764'}],occ,'dL');
+  bindSec();
   show();
 }
 function openInd(d){
@@ -744,11 +868,19 @@ function openSido(nm){
   reg.forEach(d=>{const cs=CELLS[d.i]||{}, cf=CELLF[d.i]||{};
     for(const b in cs){let dL=0,emp=0;for(const [j,e] of cs[b]){dL+=e*NET[j];emp+=e;}
       const f=cf[b];
-      if(!agg[b])agg[b]={name:I.name[b],emp:0,dL:0,sav:0,Y:0};
+      if(!agg[b])agg[b]={b:+b,name:I.name[b],emp:0,dL:0,sav:0,Y:0,pb:0};
       agg[b].emp+=emp;agg[b].dL+=dL;
-      if(f){agg[b].sav+=-dL*f[0]*gg;agg[b].Y+=f[1];}}});
+      if(f){agg[b].sav+=-dL*f[0]*gg;agg[b].Y+=f[1];agg[b].pb+=emp*f[0];}}});
   const ind=Object.values(agg);
   ind.forEach(x=>{x.rate=x.emp?x.dL/x.emp*100:0;x.tfp=x.Y>0?x.sav/x.Y*100:0;});
+  const se=new Float64Array(NO), sw=new Float64Array(NO);
+  reg.forEach(d=>{const er=R.E[d.i],wr=R.W[d.i];
+    for(let j=0;j<NO;j++){se[j]+=er[j];sw[j]+=wr[j];}});
+  const socc=[];
+  for(let j=0;j<NO;j++) if(se[j]>0) socc.push({name:O.name[j],emp:se[j],dL:se[j]*NET[j],
+    rate:NET[j]*100,sav:-sw[j]*NET[j]*gg});
+  socc.sort((a,b)=>a.dL-b.dL);
+  const OPEN0=innerWidth>700;
   document.getElementById('mbody').innerHTML=
    `<div class="mhead"><h2>${nm}</h2><div class="ms">${reg.length}개 시군구 · `+
    `Rs ${P.rs} · Rc ${P.rc} · Ws ${P.ws} · Wc ${P.wc} · g ${P.g}%</div>
@@ -759,9 +891,9 @@ function openSido(nm){
      <div class="eco"><div class="k">부가가치</div><div class="v">${fmtN(s.Y/1000,1)}<span> 조원</span></div></div>
      <div class="eco"><div class="k">TFP 성장률</div><div class="v">${s.tfp.toFixed(3)}<span>%</span></div></div>
      <div class="eco"><div class="k">TFP 증가액</div><div class="v">${fmtN(s.sav,0)}<span> 십억</span></div></div></div></div>
-    <div class="two">
-     <div><h4>시군구별 · ${reg.length}개</h4><div class="mscroll"><table id="t_a"></table></div></div>
-     <div><h4>업종별 · ${ind.length}개</h4><div class="mscroll"><table id="t_b"></table></div></div></div>
+    ${regSummary(s,ind,socc,reg.map(x=>x.i))}
+    ${secHTML('s_a','시군구별 · '+reg.length+'개','<div class="mscroll"><table id="t_a"></table></div>',OPEN0)}
+    ${secHTML('s_b','업종별 · '+ind.length+'개','<div class="mscroll"><table id="t_b"></table></div>',OPEN0)}
     <div class="mnote">항목명을 누르면 정렬.</div>`;
   mtable('t_a',[{h:'시군구',k:'name',f:F.t,s:1,l:1},{h:'취업자',u:'명',k:'emp',f:F.n,c:'#8aa0b8'},
     {h:'순변화율',u:'%',k:'rate',f:F.p2,c:'#E4032E'},{h:'순감소',u:'명',k:'dL',f:F.n,c:'#E4032E'},
@@ -769,6 +901,7 @@ function openSido(nm){
   mtable('t_b',[{h:'업종',k:'name',f:F.t,s:1,l:1},{h:'취업자',u:'명',k:'emp',f:F.n,c:'#8aa0b8'},
     {h:'순변화율',u:'%',k:'rate',f:F.p2,c:'#E4032E'},{h:'순감소',u:'명',k:'dL',f:F.n,c:'#E4032E'},
     {h:'TFP',u:'%',k:'tfp',f:F.p3,c:'#003764'},{h:'증가액',u:'십억',k:'sav',f:F.n1,c:'#003764'}],ind,'dL');
+  bindSec();
   show();
 }
 function showMini(d,e,isSido,target){
