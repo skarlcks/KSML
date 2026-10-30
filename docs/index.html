@@ -407,34 +407,36 @@ function drawKPI(S){const n=S.nat;
    `<div class="kpi"><div class="k">${k}</div><div class="v">${v}</div><div class="d">${d}</div></div>`).join('');}
 
 const COLS={
- sido:[{h:'연번',k:'no',w:32,r:1},{h:'시도',k:'name',w:50,l:1,r:1},
-   {h:'취업자',u:'명',k:'emp',w:72,f:F0.n,c:'#8aa0b8',r:1},
-   {h:'순변화율',u:'%',k:'rate',w:60,f:F0.p2,c:'#E4032E',g:'노동'},
-   {h:'순감소',u:'명',k:'dL',w:68,f:F0.n,c:'#E4032E',g:'노동'},
-   {h:'TFP 성장률',u:'%',k:'tfp',w:60,f:F0.p3,c:'#003764',g:'경제'},
-   {h:'증가액',u:'십억원',k:'sav',w:58,f:F0.n0,c:'#003764',g:'경제'}],
- sgg:[{h:'연번',k:'no',w:32,r:1},{h:'시도',k:'sido',w:42,l:1,s:1,r:1},
-   {h:'시군구',k:'sname',w:84,l:1,s:1,r:1},
-   {h:'취업자',u:'명',k:'emp',w:62,f:F0.n,c:'#8aa0b8',r:1},
-   {h:'순변화율',u:'%',k:'rate',w:56,f:F0.p2,c:'#E4032E',g:'노동'},
-   {h:'순감소',u:'명',k:'dL',w:60,f:F0.n,c:'#E4032E',g:'노동'},
-   {h:'TFP',u:'%',k:'tfp',w:52,f:F0.p3,c:'#003764',g:'경제'},
-   {h:'증가액',u:'십억',k:'sav',w:50,f:F0.n0,c:'#003764',g:'경제'}],
- ind:[{h:'연번',k:'no',w:32,r:1},{h:'업종',k:'name',w:136,l:1,s:1,r:1},
-   {h:'취업자',u:'명',k:'emp',w:64,f:F0.n,c:'#8aa0b8',r:1},
-   {h:'순변화율',u:'%',k:'rate',w:56,f:F0.p2,c:'#E4032E',g:'노동'},
-   {h:'순감소',u:'명',k:'dL',w:60,f:F0.n,c:'#E4032E',g:'노동'},
-   {h:'TFP',u:'%',k:'tfp',w:52,f:F0.p3,c:'#003764',g:'경제'},
-   {h:'증가액',u:'십억',k:'sav',w:50,f:F0.n0,c:'#003764',g:'경제'}],
- occ:[{h:'연번',k:'no',w:32,r:1},{h:'직종',k:'name',w:128,l:1,s:1,r:1},
-   {h:'취업자',u:'명',k:'emp',w:62,f:F0.n,c:'#8aa0b8',r:1},
-   {h:'대체율',u:'%',k:'sub',w:52,f:F0.p2,c:'#E4032E',g:'노동'},
-   {h:'보완율',u:'%',k:'cmp',w:52,f:F0.p2,c:'#003764',g:'노동'},
-   {h:'순변화율',u:'%',k:'rate',w:56,f:F0.p2,c:'#E4032E',g:'노동'},
-   {h:'순감소',u:'명',k:'dL',w:58,f:F0.n,c:'#E4032E',g:'노동'}]};
+ sido:[{h:'연번',k:'no',w:32,mw:26,r:1},{h:'시도',k:'name',w:50,mw:46,l:1,r:1},
+   {h:'취업자',u:'명',k:'emp',w:76,f:F0.n,c:'#8aa0b8',mh:1,r:1},
+   {h:'순변화율',u:'%',k:'rate',w:70,mw:58,f:F0.p2,c:'#E4032E',g:'노동'},
+   {h:'순감소',u:'명',k:'dL',w:68,mw:62,f:F0.n,c:'#E4032E',g:'노동'},
+   {h:'TFP 성장률',u:'%',k:'tfp',w:62,mw:54,f:F0.p3,c:'#003764',g:'경제'},
+   {h:'증가액',u:'십억',k:'sav',w:58,mw:48,f:F0.n0,c:'#003764',g:'경제'}],
+ sgg:[{h:'연번',k:'no',w:32,mw:26,r:1},{h:'시도',k:'sido',w:42,l:1,s:1,mh:1,r:1},
+   {h:'시군구',k:'sname',w:84,mw:74,l:1,s:1,r:1},
+   {h:'취업자',u:'명',k:'emp',w:62,f:F0.n,c:'#8aa0b8',mh:1,r:1},
+   {h:'순변화율',u:'%',k:'rate',w:56,mw:54,f:F0.p2,c:'#E4032E',g:'노동'},
+   {h:'순감소',u:'명',k:'dL',w:60,mw:56,f:F0.n,c:'#E4032E',g:'노동'},
+   {h:'TFP',u:'%',k:'tfp',w:54,mw:50,f:F0.p3,c:'#003764',g:'경제'},
+   {h:'증가액',u:'십억',k:'sav',w:50,mw:44,f:F0.n0,c:'#003764',g:'경제'}],
+ ind:[{h:'연번',k:'no',w:32,mw:26,r:1},{h:'업종',k:'name',w:136,mw:88,l:1,s:1,r:1},
+   {h:'취업자',u:'명',k:'emp',w:64,f:F0.n,c:'#8aa0b8',mh:1,r:1},
+   {h:'순변화율',u:'%',k:'rate',w:56,mw:54,f:F0.p2,c:'#E4032E',g:'노동'},
+   {h:'순감소',u:'명',k:'dL',w:60,mw:56,f:F0.n,c:'#E4032E',g:'노동'},
+   {h:'TFP',u:'%',k:'tfp',w:54,mw:50,f:F0.p3,c:'#003764',g:'경제'},
+   {h:'증가액',u:'십억',k:'sav',w:50,mw:44,f:F0.n0,c:'#003764',g:'경제'}],
+ occ:[{h:'연번',k:'no',w:32,mw:26,r:1},{h:'직종',k:'name',w:128,mw:86,l:1,s:1,r:1},
+   {h:'취업자',u:'명',k:'emp',w:62,f:F0.n,c:'#8aa0b8',mh:1,r:1},
+   {h:'대체율',u:'%',k:'sub',w:52,mw:48,f:F0.p2,c:'#E4032E',g:'노동'},
+   {h:'보완율',u:'%',k:'cmp',w:52,mw:48,f:F0.p2,c:'#003764',g:'노동'},
+   {h:'순변화율',u:'%',k:'rate',w:56,mw:54,f:F0.p2,c:'#E4032E',g:'노동'},
+   {h:'순감소',u:'명',k:'dL',w:58,mw:54,f:F0.n,c:'#E4032E',g:'노동'}]};
 function drawTable(S){
   const src={sido:S.sido,sgg:S.reg,ind:S.ind,occ:S.occ}[TAB];
-  const st=SORT[TAB], cols=COLS[TAB];
+  const mob=innerWidth<=600;
+  const st=SORT[TAB], cols=COLS[TAB].filter(x=>!(mob&&x.mh));
+  if(cols.every(x=>x.k!==st.k)) st.k=cols[0].k;
   const c=cols.find(x=>x.k===st.k)||cols[0];
   let rows=[...src];
   rows.sort((a,b)=> (c.s||typeof a[c.k]==='string')
@@ -443,7 +445,10 @@ function drawTable(S){
   const MX={};
   cols.forEach(x=>{if(x.c) MX[x.k]=Math.max(...rows.map(d=>Math.abs(d[x.k]||0)))||1;});
   document.getElementById('tbl').innerHTML=
-   '<colgroup>'+cols.map(x=>`<col style="width:${x.w}px">`).join('')+'</colgroup>'+
+   (()=>{if(!mob) return '<colgroup>'+cols.map(x=>`<col style="width:${x.w}px">`).join('')+'</colgroup>';
+     const tot=cols.reduce((a,x)=>a+(x.mw||x.w),0);
+     return '<colgroup>'+cols.map(x=>
+       `<col style="width:${((x.mw||x.w)/tot*100).toFixed(2)}%">`).join('')+'</colgroup>';})()+
    (()=>{const gs=[];let cur=null;
      cols.forEach(x=>{if(x.r){gs.push({r:1,x});cur=null;}
        else if(cur&&cur.g===x.g){cur.n++;}
@@ -705,7 +710,9 @@ function layout(){
     mob?host.appendChild(sec):host.after(sec);
   }
 }
-addEventListener('resize',layout);
+let _rt;
+addEventListener('resize',()=>{layout();clearTimeout(_rt);
+  _rt=setTimeout(()=>{if(ST)drawTable(ST);},150);});
 function sync(){['rs','rc','ws','wc','g'].forEach(k=>document.getElementById('s_'+k).value=P[k]);}
 function bind(){
   document.getElementById('preset').innerHTML=Object.keys(PRESET)
