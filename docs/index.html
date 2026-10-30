@@ -42,11 +42,23 @@ cursor:pointer;color:var(--tx2);font-size:11px;line-height:19px;padding:0;text-a
 .seg div+div{border-left:1px solid var(--brd)}
 .seg div.on{background:var(--navy);color:#fff;font-weight:600}
 main{padding:16px 18px 30px;overflow-x:hidden}
-.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin-bottom:13px}
-.kpi{background:#fff;border:1px solid var(--brd);border-radius:9px;padding:11px 12px}
-.kpi .k{font-size:10px;color:var(--tx2);margin-bottom:4px}
-.kpi .v{font-size:19px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.4px;color:var(--navy)}
-.kpi .d{font-size:10px;color:var(--tx3);margin-top:2px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:13px}
+.kpi{position:relative;overflow:hidden;background:#fff;border:1px solid var(--brd);
+  border-radius:9px;padding:11px 12px;border-left-width:3px}
+.kpi.lab{border-left-color:var(--red)}
+.kpi.eco{border-left-color:var(--navy)}
+.kpi .k{position:relative;z-index:2;font-size:10px;color:var(--tx2);margin-bottom:4px}
+.kpi .v{position:relative;z-index:2;font-size:19px;font-weight:700;
+  font-variant-numeric:tabular-nums;letter-spacing:-.4px;color:var(--navy)}
+.kpi.lab .v{color:var(--red)}
+.kpi .d{position:relative;z-index:2;font-size:10px;color:var(--tx3);margin-top:2px}
+.kpi .fb{position:absolute;left:0;top:0;bottom:0;z-index:0;opacity:.15}
+.kpi.lab .fb{background:var(--red)}
+.kpi.eco .fb{background:var(--navy)}
+.kpi .rf{position:absolute;top:0;bottom:0;width:0;z-index:1;
+  border-left:1px dashed rgba(15,25,40,.45)}
+.kpi .rl{position:absolute;bottom:4px;z-index:2;font-size:8.5px;color:var(--tx3);
+  white-space:nowrap;transform:translateX(-100%) translateX(-4px)}
 .grid{display:grid;grid-template-columns:minmax(360px,1fr) minmax(360px,496px);gap:13px;min-width:0}
 .card{background:#fff;border:1px solid var(--brd);border-radius:10px;padding:13px}
 .ch{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px}
@@ -229,7 +241,7 @@ aside{order:2}
 aside{position:static;max-height:none;border-right:0;border-top:1px solid var(--brd)}
 .grid{grid-template-columns:1fr}
 .card{min-width:0}
-.kpis{grid-template-columns:repeat(3,1fr)}
+.kpis{grid-template-columns:repeat(4,1fr)}
 .two{grid-template-columns:1fr}
 .scroll{overflow-x:auto;max-height:460px;min-width:0}
 .card>.scroll{width:100%}
@@ -681,7 +693,7 @@ function compute(){
   const cL=reg.filter(x=>x.cap).reduce((a,b)=>a+b.dL,0);
   const cS=reg.filter(x=>x.cap).reduce((a,b)=>a+b.sav,0);
   return {reg,ind,sido,occ,k:r.k,nat:{dL:nL,rate:nL/nE*100,sav:nS,tfp:nS/nY*100,
-    capL:nL?cL/nL*100:0,capS:nS?cS/nS*100:0}};
+    emp:nE,Y:nY,capL:nL?cL/nL*100:0,capS:nS?cS/nS*100:0}};
 }
 const MET={
  rate:{t:'취업자 순변화율',f:v=>v.toFixed(2)+'%',get:d=>d.rate},
@@ -741,14 +753,29 @@ function drawMap(S){
         const dd=byCode[q.dataset.c];
         q.classList.toggle('sel',(UNIT==='sido'?dd.sido:dd.code)===key);});};});
 }
+const CAP_E=50.45, CAP_Y=56.92;   // 수도권의 취업자·부가가치 비중
+function kbox(cls,k,v,d,fill,ref,reft){
+  const bg = fill==null ? '' :
+    `<div class="fb" style="width:${Math.max(0,Math.min(100,fill)).toFixed(1)}%"></div>`;
+  const rf = ref==null ? '' : `<div class="rf" style="left:${ref.toFixed(1)}%"></div>`;
+  return `<div class="kpi ${cls}">${bg}${rf}<div class="k">${k}</div>`+
+         `<div class="v">${v}</div><div class="d">${d}</div></div>`;
+}
 function drawKPI(S){const n=S.nat;
-  const c=[['전국 취업자 순감소',fmtMan(-n.dL)+'명',n.rate.toFixed(2)+'%'],
-   ['수도권 분담률',n.capL.toFixed(1)+'%','취업자 비중 50.45%'],
-   ['전국 TFP 성장률',n.tfp.toFixed(3)+'%','절감 실현율 '+P.g+'%'],
-   ['TFP 증가액',fmtJo(n.sav)+'원','부가가치 1,739.1조'],
-   ['성장효과 수도권 비중',n.capS.toFixed(1)+'%','부가가치 비중 56.92%']];
-  document.getElementById('kpis').innerHTML=c.map(([k,v,d])=>
-   `<div class="kpi"><div class="k">${k}</div><div class="v">${v}</div><div class="d">${d}</div></div>`).join('');}
+  const overL=n.capL-CAP_E, overY=n.capS-CAP_Y;
+  const sgn=v=>(v>=0?'+':'−')+Math.abs(v).toFixed(1)+'%p';
+  const c=[
+   kbox('lab','전국 취업자',fmtMan(n.emp)+'명','수도권 '+CAP_E.toFixed(2)+'%'),
+   kbox('lab','취업자 감소율',n.rate.toFixed(2)+'%','전 직종 가중평균'),
+   kbox('lab','취업자 순감소',fmtMan(-n.dL)+'명',fmtN(-n.dL)+'명'),
+   kbox('lab','순감소의 수도권 비중',n.capL.toFixed(1)+'%',
+        '취업자 비중 대비 '+sgn(overL),n.capL,CAP_E,'취업자 비중'),
+   kbox('eco','전국 부가가치',fmtN(n.Y/1000,1)+'조원','수도권 '+CAP_Y.toFixed(2)+'%'),
+   kbox('eco','TFP 성장률',n.tfp.toFixed(3)+'%','절감 실현율 '+P.g+'%'),
+   kbox('eco','TFP 증가액',fmtJo(n.sav)+'원',fmtN(n.sav,0)+'십억'),
+   kbox('eco','증가액의 수도권 비중',n.capS.toFixed(1)+'%',
+        '부가가치 비중 대비 '+sgn(overY),n.capS,CAP_Y,'부가가치 '+CAP_Y.toFixed(1)+'%')];
+  document.getElementById('kpis').innerHTML=c.join('');}
 
 const COLS={
  sido:[{h:'연번',k:'no',w:32,mw:26,r:1},{h:'시도',k:'name',w:50,mw:46,l:1,r:1},
