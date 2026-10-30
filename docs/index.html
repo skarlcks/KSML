@@ -469,20 +469,48 @@ if(Date.now()>DL){
   return;
 }
 
+/* 이 브라우저가 자료를 풀 수 있는지 먼저 확인 */
+const CRYPTO_OK = !!(window.crypto && window.crypto.subtle && window.TextEncoder);
+if(!CRYPTO_OK){
+  $('gpw').disabled=true; $('gbtn').disabled=true;
+  const m=$('gmsg'); m.className='gmsg';
+  m.innerHTML='이 화면에서는 자료를 풀 수 없습니다.<br>'
+    +'크롬·사파리 같은 브라우저 주소창에 <b>skarlcks.github.io/KSML</b> 을 넣어 열어 주십시오.';
+}
+
 /* 열람 */
 let PLAIN=null, VPW=null;
 $('gform').addEventListener('submit',async e=>{
   e.preventDefault();
+  if(!CRYPTO_OK) return;
   const pw=$('gpw').value, m=$('gmsg');
   if(!pw){m.className='gmsg';m.textContent='비밀번호를 입력하십시오.';return;}
   $('gbtn').disabled=true; m.className='gmsg ok'; m.textContent='자료를 여는 중…';
+  await new Promise(r=>setTimeout(r,20));
+  let data;
   try{
-    PLAIN=await unlock(pw,PAYLOAD); VPW=pw;
-    $('gate').classList.add('off');
-    window.__BOOT(PLAIN);
+    data=await unlock(pw,PAYLOAD);
   }catch(err){
-    m.className='gmsg'; m.textContent='비밀번호가 맞지 않습니다.';
+    const bad = err && (err.name==='OperationError' || err instanceof SyntaxError);
+    m.className='gmsg';
+    m.innerHTML = bad ? '비밀번호가 맞지 않습니다.'
+      : '자료를 풀지 못했습니다. 크롬·사파리 주소창에 <b>skarlcks.github.io/KSML</b> 을 '
+        +'넣어 열어 주십시오.<br><span style="font-size:10px;color:#8aa0b8">('
+        +((err&&err.name)||'오류')+')</span>';
     $('gbtn').disabled=false; $('gpw').select();
+    return;
+  }
+  PLAIN=data; VPW=pw;
+  $('gate').classList.add('off');
+  try{
+    window.__BOOT(data);
+  }catch(err){
+    $('gate').classList.remove('off');
+    $('gbtn').disabled=false;
+    const m2=$('gmsg'); m2.className='gmsg';
+    m2.innerHTML='자료는 열렸으나 화면을 그리지 못했습니다.<br>'
+      +'<span style="font-size:10px;color:#8aa0b8">'
+      +String((err&&err.message)||err).slice(0,120)+'</span>';
   }
 });
 
