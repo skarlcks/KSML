@@ -52,7 +52,7 @@ main{padding:16px 18px 30px;overflow-x:hidden}
   font-variant-numeric:tabular-nums;letter-spacing:-.4px;color:var(--navy)}
 .kpi.lab .v{color:var(--red)}
 .kpi .d{position:relative;z-index:2;font-size:9.5px;color:var(--tx3);margin-top:1px;line-height:1.3}
-.tyc{padding-top:3px!important;padding-bottom:3px!important}
+.tyc{padding-top:3px!important;padding-bottom:3px!important;text-overflow:clip!important;overflow:hidden}
 .ty{display:inline-block;font-size:9px;line-height:1.5;padding:1px 4px;border-radius:9px;
   white-space:nowrap;font-weight:600;letter-spacing:-.2px}
 .ty.t3{background:#fde3e8;color:#b00024}
@@ -560,7 +560,7 @@ function drawKPI(S){const n=S.nat;
 
 const COLS={
  sido:[{h:'연번',k:'no',w:30,mw:26,r:1},{h:'시도',k:'name',w:46,mw:46,l:1,r:1},
-   {h:'유형',k:'ty',w:78,l:1,s:1,r:1,ty:1,mh:1},
+   {h:'유형',k:'ty',w:78,mw:40,l:1,s:1,r:1,ty:1},
    {h:'취업자',u:'명',k:'emp',w:70,f:F0.n,c:'#8aa0b8',mh:1,r:1},
    {h:'순변화율',u:'%',k:'rate',w:64,mw:58,f:F0.p2,c:'#E4032E',g:'노동'},
    {h:'순감소',u:'명',k:'dL',w:62,mw:62,f:F0.n,c:'#E4032E',g:'노동'},
@@ -568,7 +568,7 @@ const COLS={
    {h:'증가액',u:'십억',k:'sav',w:52,mw:48,f:F0.n0,c:'#003764',g:'경제'}],
  sgg:[{h:'연번',k:'no',w:30,mw:26,r:1},{h:'시도',k:'sido',w:38,l:1,s:1,mh:1,r:1},
    {h:'시군구',k:'sname',w:72,mw:74,l:1,s:1,r:1},
-   {h:'유형',k:'ty',w:78,l:1,s:1,r:1,ty:1,mh:1},
+   {h:'유형',k:'ty',w:78,mw:40,l:1,s:1,r:1,ty:1},
    {h:'취업자',u:'명',k:'emp',w:54,f:F0.n,c:'#8aa0b8',mh:1,r:1},
    {h:'순변화율',u:'%',k:'rate',w:52,mw:54,f:F0.p2,c:'#E4032E',g:'노동'},
    {h:'순감소',u:'명',k:'dL',w:54,mw:56,f:F0.n,c:'#E4032E',g:'노동'},
@@ -616,7 +616,8 @@ function drawTable(S){
    rows.map(d=>{
      return `<tr data-i="${d.i}">`+cols.map(x=>{
        const v=x.f?x.f(d[x.k],d):d[x.k];
-       if(x.ty) return `<td class="l tyc"><span class="ty t${d.tyc}">${v}</span></td>`;
+       if(x.ty){const lab=mob?v.split('·').map(z=>z[0]).join('·'):v;
+         return `<td class="l tyc" title="${v}"><span class="ty t${d.tyc}">${lab}</span></td>`;}
        if(!x.c) return `<td class="${x.l?'l':''}"${x.l?` title="${v}"`:''}>${v}</td>`;
        const w=Math.abs(d[x.k]||0)/MX[x.k]*100;
        return `<td class="b"><i style="width:${w.toFixed(1)}%;background:${x.c}"></i>`+
