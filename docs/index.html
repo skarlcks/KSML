@@ -59,8 +59,7 @@ main{padding:16px 18px 30px;overflow-x:hidden}
 .ty.t2{background:#fbe9d9;color:#9a4b0a}
 .ty.t1{background:#e3eef7;color:#1b5a86}
 .ty.t0{background:#eef1f4;color:#5a6b7d}
-.sum{background:#f6f9fc;border:1px solid var(--brd2);border-left:3px solid var(--navy);
-  border-radius:8px;padding:11px 13px;margin:0 0 12px}
+.sum{background:#f6f9fc;border-left:3px solid var(--navy);padding:11px 13px;margin:0}
 .sum p{font-size:11.5px;line-height:1.8;color:var(--tx);margin:0 0 5px}
 .sum p:last-child{margin-bottom:0}
 .sum b{color:var(--navy);font-weight:700;margin-right:5px;font-size:11px}
@@ -234,7 +233,7 @@ font:inherit;font-size:13px;font-weight:600;cursor:pointer;margin-top:4px}
 .afoot{font-size:10px;color:var(--tx3);line-height:1.6;margin-top:14px;
   padding-top:11px;border-top:1px solid var(--brd2)}
 @media (max-width:600px){
-  .sum{padding:9px 10px;margin-bottom:10px}
+  .sum{padding:9px 10px;margin:0}
   .sum p{font-size:11px;line-height:1.75}
   .sec2h{padding:8px 10px;font-size:11px}
 }
@@ -664,6 +663,16 @@ function mtable(slot,cols,rows,defKey){
 }
 const F={n:v=>fmtN(v),n1:v=>fmtN(v,1),n1:v=>fmtN(v,1),p2:v=>v.toFixed(2)+'%',p3:v=>v.toFixed(3)+'%',t:v=>v};
 
+/* 접기·펴기 ---------------------------------------------------- */
+function secHTML(id,title,body,open){
+  return `<div class="sec2 ${open?'':'off'}" id="${id}">`
+    +`<div class="sec2h" data-s="${id}"><span class="ar">▾</span>${title}</div>`
+    +`<div class="sec2b">${body}</div></div>`;
+}
+function bindSec(){
+  document.querySelectorAll('.sec2h').forEach(h=>h.onclick=()=>{
+    document.getElementById(h.dataset.s).classList.toggle('off');});
+}
 /* 지역 특성 요약 ---------------------------------------------- */
 const SCEN4=[['기본',12,10,.7,.7],['보완감소',12,0,.7,.7],['물리확산',12,10,.5,.5],['복합',12,0,.5,.5]];
 let PBY=null, NETS=null;
@@ -740,7 +749,7 @@ function regSummary(d, ind, occ, memberIdx){
   const gap = tr>=rr
     ? `부가가치 대비 인건비 비중이 ${f2(pby)}로 중위(${f2(mPby)})보다 높아 충격보다 성장이 더 크게 나타남`
     : `부가가치 대비 인건비 비중이 ${f2(pby)}로 중위(${f2(mPby)})보다 낮아 성장이 충격만큼 따라오지 못함`;
-  L.push(`<b>${TY[0]}</b> ${TY[1]}. 순변화율 ${f2(d.rate)}%로 ${poolN} 중위(${f2(mRate)}%)의 ${f2(rr)}배, `
+  L.push(`<b>유형 판정</b> ${TY[1]}. 순변화율 ${f2(d.rate)}%로 ${poolN} 중위(${f2(mRate)}%)의 ${f2(rr)}배, `
     +`TFP 성장률 ${f3(d.tfp)}%로 중위(${f3(mTfp)}%)의 ${f2(tr)}배. ${gap}. 같은 유형이 ${same}곳`
     +(ex.length?` (${ex.join(', ')} 등)`:'')+`.`);
   L.push(`<b>시나리오 민감도</b> 순감소가 기본 ${n(base.dL)}명에서 복합 ${n(comp.dL)}명으로 ${f1(mult)}배. `
@@ -755,17 +764,8 @@ function regSummary(d, ind, occ, memberIdx){
     +(gainI.name!==lossI.name
       ? `반면 성장액은 ${gainI.name}(${fmtN(gainI.sav,1)}십억)이 최대로, 감소 인원과 성장 기여가 어긋남.`
       : `성장액도 같은 업종(${fmtN(gainI.sav,1)}십억)에서 최대.`));
-  return `<div class="sum">`+L.map(x=>`<p>${x}</p>`).join('')+`</div>`;
-}
-/* 접기·펴기 ---------------------------------------------------- */
-function secHTML(id,title,body,open){
-  return `<div class="sec2 ${open?'':'off'}" id="${id}">`
-    +`<div class="sec2h" data-s="${id}"><span class="ar">▾</span>${title}</div>`
-    +`<div class="sec2b">${body}</div></div>`;
-}
-function bindSec(){
-  document.querySelectorAll('.sec2h').forEach(h=>h.onclick=()=>{
-    document.getElementById(h.dataset.s).classList.toggle('off');});
+  return secHTML('s_sum','지역 특성 — '+TY[0],
+    `<div class="sum">`+L.map(x=>`<p>${x}</p>`).join('')+`</div>`, true);
 }
 function openRegion(d){
   const OPEN0=innerWidth>700;
