@@ -276,11 +276,15 @@ aside{position:static;max-height:none;border-right:0;border-top:1px solid var(--
 .scroll{overflow-x:auto;max-height:460px;min-width:0}
 .card>.scroll{width:100%}
 /* 휴대폰: 팝업 하나만 위아래로 움직이고, 표 위에서는 가로 손짓만 표가 받음 */
-.mscroll{max-height:none;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain}
+.mscroll,.sec2b .mscroll,.sec2b .scroll{max-height:none;overflow:visible}
 .mscroll table th{position:static}
 .mhead{position:static}
-#mbody{padding:11px 14px 16px}
+#mbody{padding:11px 14px 16px;flex:none;overflow:visible;min-height:0}
 .mhtop{padding:13px 14px 10px}
+/* 좁은 화면에서는 모달 전체가 세로로 스크롤(표 위에서 민 손짓도 받도록) */
+#modal{overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+#modal.on{display:block}
+#mhdr{position:sticky;top:0;z-index:8}
 body.lock{overflow:hidden;position:fixed;width:100%}
 .lgwrap{flex-wrap:wrap}
 .lg{min-width:100%;font-size:8.5px}
